@@ -64,10 +64,10 @@ impl Chord {
   }
 }
 
-pub fn get_chord(chord: &str) -> Option<Vec<&'static str>> {
+pub fn get_chord(chord: &str) -> Option<Vec<Note>> {
   let (root_note, remaining) = split_root(chord)?;
 
-  let (extensions, triad_str) = strip_extensions(&remaining);
+  let (extensions, triad_str) = strip_extensions(remaining);
   let triad = match triad_str {
     "" => Triad::Major,
     "m" => Triad::Minor,
@@ -80,12 +80,12 @@ pub fn get_chord(chord: &str) -> Option<Vec<&'static str>> {
 
   let chord = Chord { triad, extensions };
 
-  let root_index = get_note_index(root_note);
+  let root_index = root_note.index();
   let intervals = chord.intervals();
   let mut chord_notes = Vec::with_capacity(intervals.len());
   for interval in intervals {
     let note_index = (root_index + interval) % 12;
-    chord_notes.push(GLOBAL_NOTES[note_index]);
+    chord_notes.push(Note::from_index(note_index));
   }
   Some(chord_notes)
 }
@@ -107,7 +107,6 @@ pub fn strip_extensions(mut remaing: &str) -> (Vec<Extension>, &str) {
   loop {
     let mut matched = false;
     for (pattern, exts) in patterns {
-      // strip_suffix inverte a string
       if let Some(stripped) = remaing.strip_suffix(pattern) {
         for ext in exts.iter() {
           extensions.push(ext.clone());
@@ -187,10 +186,19 @@ mod tests {
 
   #[test]
   fn test_get_chord() {
-    assert_eq!(get_chord("C"), Some(vec!["C", "E", "G"]));
-    assert_eq!(get_chord("Dm"), Some(vec!["D", "F", "A"]));
-    assert_eq!(get_chord("G7"), Some(vec!["G", "B", "D", "F"]));
-    assert_eq!(get_chord("F#maj7"), Some(vec!["F#", "A#", "C#", "F"]));
-    assert_eq!(get_chord("Bb9"), Some(vec!["A#", "D", "F", "G#", "C"]));
+    assert_eq!(get_chord("C"), Some(vec![Note::C, Note::E, Note::G]));
+    assert_eq!(get_chord("Dm"), Some(vec![Note::D, Note::F, Note::A]));
+    assert_eq!(
+      get_chord("G7"),
+      Some(vec![Note::G, Note::B, Note::D, Note::F])
+    );
+    assert_eq!(
+      get_chord("F#maj7"),
+      Some(vec![Note::FSharp, Note::ASharp, Note::CSharp, Note::F])
+    );
+    assert_eq!(
+      get_chord("Bb9"),
+      Some(vec![Note::ASharp, Note::D, Note::F, Note::GSharp, Note::C])
+    );
   }
 }

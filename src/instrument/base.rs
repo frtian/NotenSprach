@@ -1,4 +1,5 @@
-#[allow(dead_code, unused)]
+#![allow(unused)]
+
 #[derive(Debug, Clone)]
 pub struct Instrument {
     pub name: String,
@@ -17,7 +18,7 @@ impl Instrument {
     pub fn drop_d() -> Self {
         Self {
             name: String::from("Drop D Guitar"),
-            strings: vec!["B", "A", "D", "G", "B", "E"],
+            strings: vec!["D", "A", "D", "G", "B", "E"],
             fret_count: 22,
         }
     }
